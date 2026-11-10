@@ -48,8 +48,10 @@ FIXTURE = ROOT / "tests" / "fixtures" / "vacancies_sample.json"
 source = RAW if RAW.exists() else FIXTURE
 print(f"Источник данных: {source}")
 if source == FIXTURE:
-    print("ВНИМАНИЕ: это синтетическая фикстура, а не рыночные данные. "
-          "Числа отсюда нельзя публиковать.")
+    print(
+        "ВНИМАНИЕ: это синтетическая фикстура, а не рыночные данные. "
+        "Числа отсюда нельзя публиковать."
+    )
 
 frame = clean.drop_archived(clean.build_frame(collect.load(source)))
 print(f"Вакансий в выборке: {len(frame)}")
@@ -180,13 +182,27 @@ NOTEBOOKS = {
 }
 
 
+def source_lines(text: str) -> list[str]:
+    """Исходник ячейки списком строк — как это принято в `.ipynb`.
+
+    В `nbformat` перевод строки есть у всех строк, кроме последней. Если
+    оставить перевод и у последней, редакторы ноутбуков и `ruff format`
+    считают файл неправильно отформатированным и правят его по-своему —
+    и проверка «ноутбуки совпадают со скриптом» начинает врать.
+    """
+    lines = text.splitlines()
+    if not lines:
+        return []
+    return [line + "\n" for line in lines[:-1]] + [lines[-1]]
+
+
 def markdown_cell(text: str, cell_id: str) -> dict:
     """Ячейка с текстом."""
     return {
         "cell_type": "markdown",
         "id": cell_id,
         "metadata": {},
-        "source": text.splitlines(keepends=True),
+        "source": source_lines(text),
     }
 
 
@@ -198,7 +214,7 @@ def code_cell(text: str, cell_id: str) -> dict:
         "execution_count": None,
         "metadata": {},
         "outputs": [],
-        "source": text.splitlines(keepends=True),
+        "source": source_lines(text),
     }
 
 
@@ -229,10 +245,11 @@ def main() -> int:
     NOTEBOOKS_DIR.mkdir(parents=True, exist_ok=True)
     for name, cells in NOTEBOOKS.items():
         target = NOTEBOOKS_DIR / name
-        target.write_text(
-            json.dumps(build_notebook(cells), ensure_ascii=False, indent=1),
-            encoding="utf-8",
-        )
+        # Пишем байтами, а не текстом: в текстовом режиме Windows превращает
+        # «\n» в «\r\n», и ноутбук, собранный на этой машине, перестаёт
+        # совпадать с тем же ноутбуком, собранным в CI на Linux.
+        payload = json.dumps(build_notebook(cells), ensure_ascii=False, indent=1) + "\n"
+        target.write_bytes(payload.encode("utf-8"))
         print(f"  {name}: {len(cells)} ячеек")
     return 0
 
