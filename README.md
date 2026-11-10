@@ -62,7 +62,10 @@ python -m vacancy_dashboard.collect --text python --pages 20
 # 3. Посчитать ответы и построить графики
 python -m vacancy_dashboard.pipeline --input data/raw/vacancies.json
 
-# 4. Посмотреть на то же самое с фильтрами
+# 4. Подготовить раздел «Результаты» для этого README
+python scripts/render_results.py --input data/raw/vacancies.json --text python --pages 20
+
+# 5. Посмотреть на то же самое с фильтрами
 streamlit run app/dashboard.py
 ```
 
@@ -72,7 +75,7 @@ streamlit run app/dashboard.py
 работы API, а не формальность).
 
 Есть и `make`: `make install`, `make test`, `make collect`, `make pipeline`,
-`make app`.
+`make results`, `make app`.
 
 ### Тесты и ноутбуки
 
@@ -144,10 +147,12 @@ jupyter nbconvert --to notebook --execute notebooks/01_stack.ipynb
 ```bash
 python -m vacancy_dashboard.collect --text python --pages 20
 python -m vacancy_dashboard.pipeline --input data/raw/vacancies.json
+python scripts/render_results.py --input data/raw/vacancies.json --text python --pages 20
 ```
 
-Пайплайн печатает сводку и тексты трёх ответов — их можно скопировать сюда
-дословно, вместе с числом вакансий, на которых они посчитаны.
+Скрипт `render_results.py` печатает готовый раздел: сводку по выборке, тексты
+трёх ответов, их таблицы и ссылки на графики. Числа в README отсюда не
+переписываются руками — иначе они разъедутся с прогоном, который их посчитал.
 
 ## Структура репозитория
 
@@ -157,6 +162,7 @@ vacancy-dashboard/
 ├── app/dashboard.py          # дашборд на Streamlit
 ├── notebooks/                # три ноутбука — по одному на вопрос
 ├── scripts/build_notebooks.py # сборка ноутбуков из кода
+├── scripts/render_results.py  # раздел «Результаты» для README из прогона
 ├── tests/                    # тесты и синтетическая фикстура
 ├── data/                     # сырые и обработанные данные (не в репозитории)
 ├── docs/figures/             # графики (не в репозитории)

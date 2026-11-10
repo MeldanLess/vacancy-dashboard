@@ -6,6 +6,7 @@
 #     make collect   — собрать вакансии с hh.ru
 #     make pipeline  — посчитать ответы и построить графики
 #     make notebooks — пересобрать ноутбуки из скрипта
+#     make results   — подготовить раздел «Результаты» для README
 #     make app       — запустить дашборд
 
 PYTHON ?= python
@@ -14,7 +15,7 @@ TEXT ?= python
 PAGES ?= 20
 INPUT ?= data/raw/vacancies.json
 
-.PHONY: help install test coverage lint format check collect pipeline notebooks app clean
+.PHONY: help install test coverage lint format check collect pipeline notebooks results app clean
 
 help:
 	@echo "install   — поставить зависимости (requirements.txt и requirements-dev.txt)"
@@ -26,6 +27,7 @@ help:
 	@echo "collect   — собрать вакансии с hh.ru (нужна сеть)"
 	@echo "pipeline  — посчитать три ответа и построить графики"
 	@echo "notebooks — пересобрать ноутбуки из scripts/build_notebooks.py"
+	@echo "results   — подготовить раздел «Результаты» для README из выгрузки"
 	@echo "app       — запустить дашборд на Streamlit"
 	@echo "clean     — убрать временные файлы"
 
@@ -56,6 +58,9 @@ pipeline:
 
 notebooks:
 	$(PYTHON) scripts/build_notebooks.py
+
+results:
+	$(PYTHON) scripts/render_results.py --input $(INPUT) --text $(TEXT) --pages $(PAGES)
 
 app:
 	$(PYTHON) -m streamlit run app/dashboard.py
