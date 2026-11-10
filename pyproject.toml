@@ -67,4 +67,6 @@ exclude_lines = [
     "pragma: no cover",
     "if TYPE_CHECKING:",
     "raise NotImplementedError",
+    # Точка входа как скрипт: её запускает человек из терминала, а не тесты.
+    'if __name__ == "__main__":',
 ]

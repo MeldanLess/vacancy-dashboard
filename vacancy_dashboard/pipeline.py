@@ -37,11 +37,12 @@ PUBLISHED_FIGURES = ROOT / "docs" / "figures"
 
 
 def is_fixture(path: str | Path) -> bool:
-    """Файл с синтетической фикстурой?"""
-    try:
-        return Path(path).resolve() == FIXTURE.resolve()
-    except OSError:
-        return False
+    """Файл с синтетической фикстурой?
+
+    `resolve()` не бросает исключений на несуществующем файле, поэтому
+    проверка безопасна и для пути, которого ещё нет.
+    """
+    return Path(path).resolve() == FIXTURE.resolve()
 
 
 def build(input_path: str | Path) -> pd.DataFrame:
