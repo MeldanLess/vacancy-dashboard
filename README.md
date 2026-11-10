@@ -56,18 +56,21 @@ hh.ru API  →  collect.py  →  clean.py  →  features.py  →  analysis.py  �
 # 1. Зависимости
 pip install -r requirements.txt -r requirements-dev.txt
 
-# 2. Собрать вакансии с hh.ru (нужна сеть)
+# 2. Собрать, посчитать, построить графики и вписать раздел в README
+python scripts/publish_results.py --text python --pages 20
+
+# 3. Посмотреть на то же самое с фильтрами
+streamlit run app/dashboard.py
+```
+
+Шаг 2 — это весь путь до опубликованных чисел одной командой. Те же шаги
+по отдельности, если нужно что-то одно:
+
+```bash
 python -m vacancy_dashboard.collect --text python --pages 20
-
-# 3. Посчитать ответы и построить графики
 python -m vacancy_dashboard.pipeline --input data/raw/vacancies.json
-
-# 4. Подготовить раздел «Результаты» для этого README
 python scripts/render_results.py --input data/raw/vacancies.json --text python --pages 20 \
     --write-readme README.md
-
-# 5. Посмотреть на то же самое с фильтрами
-streamlit run app/dashboard.py
 ```
 
 Токен hh.ru не обязателен: без него API отдаёт меньше результатов, но
@@ -81,10 +84,9 @@ streamlit run app/dashboard.py
 app/dashboard.py`.
 
 Есть и `make`: `make install`, `make test`, `make collect`, `make pipeline`,
-`make results`, `make dump`, `make app`.
-
-`make dump` — весь путь до опубликованных чисел одной командой: собрать,
-посчитать, построить графики и вписать раздел «Результаты» в README.
+`make results`, `make dump`, `make app`. `make dump` делает то же, что
+`python scripts/publish_results.py`, — но `make` есть не везде, а Python
+есть везде, где запускается этот проект.
 
 ### Развёртывание
 
@@ -180,10 +182,7 @@ jupyter nbconvert --to notebook --execute notebooks/01_stack.ipynb
 Заполняется это одним прогоном:
 
 ```bash
-python -m vacancy_dashboard.collect --text python --pages 20
-python -m vacancy_dashboard.pipeline --input data/raw/vacancies.json
-python scripts/render_results.py --input data/raw/vacancies.json --text python --pages 20 \
-    --write-readme README.md
+python scripts/publish_results.py --text python --pages 20
 ```
 
 Скрипт `render_results.py` не печатает раздел, а вписывает его в README между
@@ -203,6 +202,7 @@ vacancy-dashboard/
 ├── app/dashboard.py          # дашборд на Streamlit
 ├── notebooks/                # три ноутбука — по одному на вопрос
 ├── scripts/build_notebooks.py # сборка ноутбуков из кода
+├── scripts/publish_results.py # весь путь до чисел одной командой
 ├── scripts/render_results.py  # раздел «Результаты» для README из прогона
 ├── tests/                    # тесты и синтетическая фикстура
 ├── data/                     # сырые и обработанные данные (не в репозитории)
