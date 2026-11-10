@@ -1,0 +1,79 @@
+name: CI
+
+# Проверяет стиль, запускает тесты и выполняет ноутбуки при каждом пуше и
+# каждом pull request.
+#
+# Сеть в тестах не используется: сборщик работает с подменённой сессией
+# `requests`, а для проверки графиков и ноутбуков используется синтетическая
+# фикстура. Настоящая выгрузка hh.ru в CI не скачивается — она живёт в
+# `data/raw/` и не попадает в репозиторий.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  проверка:
+    name: Стиль, тесты и ноутбуки
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Клонируем репозиторий
+        uses: actions/checkout@v4
+
+      - name: Готовим Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Ставим зависимости
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Проверяем стиль
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Запускаем тесты и считаем покрытие
+        run: pytest --cov=vacancy_dashboard --cov-report=term-missing --cov-report=xml
+
+      - name: Проверяем, что дашборд собирается
+        run: python -c "import app.dashboard"
+
+      - name: Прогоняем пайплайн на фикстуре
+        run: |
+          python -m vacancy_dashboard.pipeline \
+            --input tests/fixtures/vacancies_sample.json \
+            --output-dir .ci/processed \
+            --figures-dir .ci/figures
+
+      - name: Проверяем, что ноутбуки соответствуют скрипту
+        run: |
+          python scripts/build_notebooks.py
+          git diff --exit-code notebooks/
+
+      - name: Выполняем ноутбуки
+        run: |
+          mkdir -p .ci/notebooks
+          jupyter nbconvert --to notebook --execute \
+            --output-dir .ci/notebooks \
+            --ExecutePreprocessor.timeout=300 \
+            notebooks/01_stack.ipynb \
+            notebooks/02_geography.ipynb \
+            notebooks/03_experience.ipynb
+
+      - name: Выкладываем отчёт о покрытии
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
+          if-no-files-found: ignore
