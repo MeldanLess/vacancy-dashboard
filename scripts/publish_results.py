@@ -44,6 +44,17 @@ import render_results  # noqa: E402
 from vacancy_dashboard import collect, pipeline  # noqa: E402
 
 
+def under_root(path: str) -> Path:
+    """Путь относительно корня репозитория, если он задан относительным.
+
+    Скрипт должен работать из любого каталога внутри репозитория, а не
+    только из корня: путь «data/raw/vacancies.json» тогда означает одно и то
+    же и в корне, и в `scripts/`.
+    """
+    candidate = Path(path)
+    return candidate if candidate.is_absolute() else ROOT / candidate
+
+
 def main(argv: list[str] | None = None) -> int:
     """Точка входа: `python scripts/publish_results.py …`."""
     parser = argparse.ArgumentParser(
@@ -71,7 +82,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    source = Path(args.input)
+    source = under_root(args.input)
+    figures_dir = under_root(args.figures_dir)
+    output_dir = under_root(args.output_dir)
+    readme = under_root(args.readme)
     source.parent.mkdir(parents=True, exist_ok=True)
 
     if not args.skip_collect:
@@ -92,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     print("Считаем ответы и рисуем графики…")
-    pipeline.run(source, args.output_dir, args.figures_dir)
+    pipeline.run(source, output_dir, figures_dir)
 
     print("Вписываем раздел «Результаты» в README…")
     code = render_results.main(
@@ -104,9 +118,9 @@ def main(argv: list[str] | None = None) -> int:
             "--pages",
             str(args.pages),
             "--figures-dir",
-            args.figures_dir,
+            str(figures_dir),
             "--write-readme",
-            args.readme,
+            str(readme),
             *(["--allow-fixture"] if args.allow_fixture else []),
         ]
     )
