@@ -1,0 +1,18 @@
+# В образ не попадает то, что не нужно приложению в бою.
+.git
+.github
+.ci
+data
+docs
+notebooks
+tests
+__pycache__
+*.py[cod]
+*.egg-info
+.coverage
+coverage.xml
+.pytest_cache
+.ruff_cache
+.ipynb_checkpoints
+Makefile
+README.md

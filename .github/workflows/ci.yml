@@ -79,3 +79,20 @@ jobs:
           name: coverage
           path: coverage.xml
           if-no-files-found: ignore
+
+  # Образ собирается на каждом коммите, а не только на теге: сломанный
+  # Dockerfile должен падать здесь, а не в момент выкладки на сервер.
+  image:
+    name: Образ контейнера
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Клонируем репозиторий
+        uses: actions/checkout@v4
+
+      - name: Собираем образ
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: vacancy-dashboard:ci

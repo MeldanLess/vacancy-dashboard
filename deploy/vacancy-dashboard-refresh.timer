@@ -1,0 +1,20 @@
+# Таймер ежедневного обновления выгрузки.
+#
+#   sudo cp deploy/vacancy-dashboard-refresh.timer /etc/systemd/system/
+#   sudo systemctl enable --now vacancy-dashboard-refresh.timer
+#   systemctl list-timers vacancy-dashboard-refresh.timer
+#
+# Время выбрано не круглое: в 06:00 по hh.ru приходит всё, что настроено на
+# круглые минуты, и API отвечает медленнее. Здесь же `RandomizedDelaySec`
+# разводит запросы разных установок по времени.
+
+[Unit]
+Description=Ежедневное обновление выгрузки вакансий hh.ru
+
+[Timer]
+OnCalendar=*-*-* 06:17:00
+Persistent=true
+RandomizedDelaySec=20m
+
+[Install]
+WantedBy=timers.target

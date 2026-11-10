@@ -1,0 +1,42 @@
+# Боевой стек дашборда: контейнер со Streamlit, наружу — только nginx.
+#
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Чем отличается от локального запуска и почему:
+#   * выгрузка вакансий не лежит в образе, а подключается каталогом: она
+#     обновляется на сервере, и образ при этом не пересобирается
+#   * порт не публикуется наружу — контейнер слушает только localhost, а
+#     наружу его выпускает nginx с сертификатом
+#   * контейнер перезапускается, если его не остановили
+
+services:
+  dashboard:
+    image: ${DASHBOARD_IMAGE:-vacancy-dashboard:latest}
+    container_name: vacancy-dashboard
+    restart: unless-stopped
+    environment:
+      # Явный путь к выгрузке: по умолчанию приложение ищет её рядом с
+      # собой, а в контейнере «рядом» — это /app.
+      VACANCY_DASHBOARD_DATA: /app/data/raw/vacancies.json
+    volumes:
+      # Каталог с выгрузкой: его наполняет таймер обновления, а читает
+      # приложение. Подключение нужно с правами на запись — сборщик тоже
+      # работает внутри контейнера.
+      - ./data/raw:/app/data/raw
+    ports:
+      # Только localhost: наружу этот порт не выставлен.
+      - "127.0.0.1:8501:8501"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health')"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # nginx в этом файле нет: на сервере он установлен как системный сервис,
+  # а не запускается контейнером — тогда certbot обновляет сертификаты TLS
+  # без перезапуска контейнера. Подробнее в docs/DEPLOYMENT.md.

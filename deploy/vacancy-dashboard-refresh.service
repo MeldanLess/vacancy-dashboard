@@ -1,0 +1,28 @@
+# Обновление выгрузки вакансий на сервере.
+#
+#   sudo cp deploy/vacancy-dashboard-refresh.service /etc/systemd/system/
+#   sudo cp deploy/vacancy-dashboard-refresh.timer /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now vacancy-dashboard-refresh.timer
+#
+# Сбор идёт внутри контейнера: на сервере не нужен свой Python, а образ
+# приложения уже содержит и сборщик, и его зависимости.
+
+[Unit]
+Description=Обновить выгрузку вакансий hh.ru для дашборда
+Documentation=https://github.com/MeldanLess/vacancy-dashboard
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/vacancy-dashboard
+
+# Сборщик вежлив к API hh.ru: между страницами стоит пауза, а при 429 он
+# ждёт столько, сколько просит сервер. Поэтому задача может идти минуту и
+# дольше — это нормально, а не зависание.
+ExecStart=/usr/bin/docker compose -f docker-compose.prod.yml exec -T dashboard \
+    python -m vacancy_dashboard.collect --text python --pages 20 --out data/raw/vacancies.json
+
+TimeoutStartSec=1800
