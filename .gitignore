@@ -1,0 +1,39 @@
+# Сырые выгрузки API hh.ru — это десятки мегабайт JSON. В репозитории им не
+# место: их можно воспроизвести одной командой, а история git не должна
+# раздуваться из-за файлов, которые никто не читает.
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Графики и таблицы, которые собирает пайплайн.
+docs/figures/*
+!docs/figures/.gitkeep
+
+# Токен доступа к API hh.ru.
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Инструменты
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+.mypy_cache/
+
+# Результаты локальных запусков ноутбуков и служебные каталоги CI.
+.nbout/
+.ci/
+
