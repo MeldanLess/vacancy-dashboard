@@ -1,0 +1,262 @@
+[
+ {
+  "id": "101",
+  "name": "Senior Python разработчик",
+  "employer": {"id": "1", "name": "Технологии А", "logo_url": null},
+  "area": {"id": "1", "name": "Москва"},
+  "salary": {"from": 250000, "to": 350000, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-10-05T10:00:00+0300",
+  "created_at": "2026-10-05T10:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/101",
+  "snippet": {
+   "requirement": "Опыт разработки на Python, знание FastAPI и PostgreSQL",
+   "responsibility": "Писать сервисы, собирать их в Docker, работать с Kafka"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [{"id": "413", "name": "Python"}],
+  "work_format": ["OFFICE"]
+ },
+ {
+  "id": "102",
+  "name": "Junior Python разработчик",
+  "employer": {"id": "2", "name": "ИТ-компания Б", "logo_url": null},
+  "area": {"id": "88", "name": "Казань"},
+  "salary": {"from": 80000, "to": 120000, "currency": "RUR", "is_gross": false},
+  "published_at": "2026-10-12T09:00:00+0300",
+  "created_at": "2026-10-12T09:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/102",
+  "snippet": {
+   "requirement": "Python, FastAPI, PostgreSQL, Git",
+   "responsibility": "Docker, Linux, деплой на тестовый стенд"
+  },
+  "schedule": {"id": "flexible", "name": "Гибкий график"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [],
+  "work_format": ["REMOTE"]
+ },
+ {
+  "id": "103",
+  "name": "Middle Backend разработчик (Python)",
+  "employer": {"id": "3", "name": "Софт В", "logo_url": null},
+  "area": {"id": "2", "name": "Санкт-Петербург"},
+  "salary": {"from": 150000, "to": 200000, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-11-02T12:00:00+0300",
+  "created_at": "2026-11-02T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/103",
+  "snippet": {
+   "requirement": "Python, Django, PostgreSQL, Redis",
+   "responsibility": "Docker, Kubernetes, code review"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [{"id": "413", "name": "Python"}],
+  "work_format": ["HYBRID"]
+ },
+ {
+  "id": "104",
+  "name": "Go разработчик",
+  "employer": {"id": "4", "name": "Инфраструктура Г", "logo_url": null},
+  "area": {"id": "1", "name": "Москва"},
+  "salary": {"from": 220000, "to": 300000, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-11-03T12:00:00+0300",
+  "created_at": "2026-11-03T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/104",
+  "snippet": {
+   "requirement": "Go, PostgreSQL, Kubernetes, gRPC",
+   "responsibility": "Писать сервисы на Go, деплоить в Kubernetes"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [],
+  "work_format": ["OFFICE"]
+ },
+ {
+  "id": "105",
+  "name": "Data Analyst",
+  "employer": {"id": "5", "name": "Аналитика Д", "logo_url": null},
+  "area": {"id": "4", "name": "Новосибирск"},
+  "salary": null,
+  "published_at": "2026-11-04T12:00:00+0300",
+  "created_at": "2026-11-04T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/105",
+  "snippet": {
+   "requirement": "SQL, Python, pandas, Power BI",
+   "responsibility": "Строить отчётность и витрины данных"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "110", "name": "Аналитик"}],
+  "key_skills": [{"id": "413", "name": "Python"}],
+  "work_format": ["REMOTE"]
+ },
+ {
+  "id": "106",
+  "name": "Java разработчик",
+  "employer": {"id": "6", "name": "Банк Е", "logo_url": null},
+  "area": {"id": "4", "name": "Новосибирск"},
+  "salary": {"from": 180000, "to": 250000, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-11-05T12:00:00+0300",
+  "created_at": "2026-11-05T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/106",
+  "snippet": {
+   "requirement": "Java, Spring, PostgreSQL, Kafka",
+   "responsibility": "Docker, CI/CD, GitLab CI"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [],
+  "work_format": []
+ },
+ {
+  "id": "107",
+  "name": "1С разработчик",
+  "employer": {"id": "7", "name": "Торговля Ж", "logo_url": null},
+  "area": {"id": "3", "name": "Екатеринбург"},
+  "salary": {"from": 100000, "to": 150000, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-10-20T12:00:00+0300",
+  "created_at": "2026-10-20T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/107",
+  "snippet": {
+   "requirement": "1С, SQL, PostgreSQL",
+   "responsibility": "Доработка конфигураций 1С"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [],
+  "work_format": ["OFFICE"]
+ },
+ {
+  "id": "108",
+  "name": "Python разработчик (стажёр)",
+  "employer": {"id": "8", "name": "Стартап З", "logo_url": null},
+  "area": {"id": "88", "name": "Кострома"},
+  "salary": {"from": 40000, "to": 60000, "currency": "RUR", "is_gross": false},
+  "published_at": "2026-11-06T12:00:00+0300",
+  "created_at": "2026-11-06T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/108",
+  "snippet": {
+   "requirement": "Python, основы SQL, Git",
+   "responsibility": "Писать тесты и помогать с ревью"
+  },
+  "schedule": {"id": "flexible", "name": "Гибкий график"},
+  "employment": {"id": "part", "name": "Частичная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [],
+  "work_format": ["OFFICE"]
+ },
+ {
+  "id": "109",
+  "name": "Senior Python разработчик",
+  "employer": {"id": "9", "name": "Финтех И", "logo_url": null},
+  "area": {"id": "1", "name": "Московская область"},
+  "salary": {"from": 200000, "to": null, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-11-07T12:00:00+0300",
+  "created_at": "2026-11-07T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/109",
+  "snippet": {
+   "requirement": "Python, FastAPI, PostgreSQL, Docker, Kubernetes",
+   "responsibility": "Архитектура сервисов, PostgreSQL, нагрузочное тестирование"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [{"id": "413", "name": "Python"}],
+  "work_format": ["REMOTE"]
+ },
+ {
+  "id": "110",
+  "name": "Frontend разработчик",
+  "employer": {"id": "10", "name": "Веб К", "logo_url": null},
+  "area": {"id": "1", "name": "Москва"},
+  "salary": {"from": 180000, "to": 250000, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-11-08T12:00:00+0300",
+  "created_at": "2026-11-08T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/110",
+  "snippet": {
+   "requirement": "JavaScript, TypeScript, React, Redux",
+   "responsibility": "Вёрстка, CSS, Webpack"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [],
+  "work_format": ["HYBRID"]
+ },
+ {
+  "id": "111",
+  "name": "ML инженер",
+  "employer": {"id": "11", "name": "Лаборатория Л", "logo_url": null},
+  "area": {"id": "1", "name": "Москва"},
+  "salary": {"from": 250000, "to": 350000, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-11-09T12:00:00+0300",
+  "created_at": "2026-11-09T12:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/111",
+  "snippet": {
+   "requirement": "Python, PyTorch, scikit-learn, pandas",
+   "responsibility": "Docker, обучение моделей, highload"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "113", "name": "Менеджер продукта"}],
+  "key_skills": [],
+  "work_format": ["REMOTE"]
+ },
+ {
+  "id": "112",
+  "name": "Python разработчик",
+  "employer": {"id": "12", "name": "Софт М", "logo_url": null},
+  "area": {"id": "66", "name": "Самара"},
+  "salary": {"from": 130000, "to": 180000, "currency": "RUR", "is_gross": false},
+  "published_at": "2026-10-01T12:00:00+0300",
+  "created_at": "2026-10-01T12:00:00+0300",
+  "archived": true,
+  "alternate_url": "https://hh.ru/vacancy/112",
+  "snippet": {
+   "requirement": "Python, Flask, PostgreSQL",
+   "responsibility": "Поддержка legacy-сервисов"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [],
+  "work_format": ["OFFICE"]
+ },
+ {
+  "id": "101",
+  "name": "Senior Python разработчик",
+  "employer": {"id": "1", "name": "Технологии А", "logo_url": null},
+  "area": {"id": "1", "name": "Москва"},
+  "salary": {"from": 250000, "to": 350000, "currency": "RUR", "is_gross": true},
+  "published_at": "2026-10-05T10:00:00+0300",
+  "created_at": "2026-10-05T10:00:00+0300",
+  "archived": false,
+  "alternate_url": "https://hh.ru/vacancy/101",
+  "snippet": {
+   "requirement": "Опыт разработки на Python, знание FastAPI и PostgreSQL",
+   "responsibility": "Писать сервисы, собирать их в Docker, работать с Kafka"
+  },
+  "schedule": {"id": "fullDay", "name": "Полный день"},
+  "employment": {"id": "full", "name": "Полная занятость"},
+  "professional_roles": [{"id": "96", "name": "Программист"}],
+  "key_skills": [{"id": "413", "name": "Python"}],
+  "work_format": ["OFFICE"]
+ }
+]
