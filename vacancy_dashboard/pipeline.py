@@ -26,6 +26,23 @@ import pandas as pd
 
 from vacancy_dashboard import analysis, clean, collect
 
+# Корень репозитория: на один уровень выше пакета.
+ROOT = Path(__file__).resolve().parent.parent
+
+# Синтетическая фикстура для тестов. Её числа — не рыночные.
+FIXTURE = ROOT / "tests" / "fixtures" / "vacancies_sample.json"
+
+# Куда кладутся графики, на которые ссылается README.
+PUBLISHED_FIGURES = ROOT / "docs" / "figures"
+
+
+def is_fixture(path: str | Path) -> bool:
+    """Файл с синтетической фикстурой?"""
+    try:
+        return Path(path).resolve() == FIXTURE.resolve()
+    except OSError:
+        return False
+
 
 def build(input_path: str | Path) -> pd.DataFrame:
     """Сырой JSON → готовая таблица без архивных вакансий."""
@@ -72,6 +89,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output-dir", default="data/processed", help="Куда сложить таблицу.")
     parser.add_argument("--figures-dir", default="docs/figures", help="Куда сложить графики.")
     args = parser.parse_args(argv)
+
+    # Графики в `docs/figures/` ссылаются из README: в них должны быть числа
+    # настоящей выгрузки. Прогон на фикстуре туда писать нельзя — иначе
+    # синтетические числа молча заменят рыночные и попадут в коммит.
+    if is_fixture(args.input) and Path(args.figures_dir).resolve() == PUBLISHED_FIGURES:
+        print(
+            "Отказ: на входе синтетическая фикстура, а графики писались бы в "
+            f"{PUBLISHED_FIGURES}. Укажите другой каталог (--figures-dir)."
+        )
+        return 1
 
     frame, results = run(args.input, args.output_dir, args.figures_dir)
 

@@ -86,3 +86,79 @@ class TestSection:
         )
         assert results[0].text in section
         assert "нижние границы вилок" in section
+
+
+class TestWriteIntoReadme:
+    """Раздел вписывается в README сам, а не копируется руками."""
+
+    def test_тело_пишется_между_маркерами(self) -> None:
+        readme = (
+            "# Проект\n\n## Результаты\n\n"
+            f"{render_results.MARKER_START}\n\nстарое\n\n{render_results.MARKER_END}\n\n"
+            "## Дальше\n"
+        )
+        updated = render_results.replace_section(readme, "новое")
+        assert "новое" in updated
+        assert "старое" not in updated
+        assert "## Дальше" in updated
+
+    def test_без_маркеров_это_ошибка(self) -> None:
+        with pytest.raises(ValueError, match="маркер"):
+            render_results.replace_section("# Проект\n\n## Результаты\n", "новое")
+
+    def test_фикстура_опознаётся(self) -> None:
+        assert render_results.is_fixture(render_results.FIXTURE)
+        assert not render_results.is_fixture(ROOT / "data" / "raw" / "vacancies.json")
+
+    def test_на_фикстуре_в_readme_не_пишется(self, tmp_path: Path, capsys) -> None:
+        readme = tmp_path / "README.md"
+        readme.write_text(
+            f"{render_results.MARKER_START}\n\n{render_results.MARKER_END}\n", encoding="utf-8"
+        )
+        code = render_results.main(
+            [
+                "--input",
+                str(render_results.FIXTURE),
+                "--write-readme",
+                str(readme),
+                "--figures-dir",
+                str(tmp_path / "figures"),
+            ]
+        )
+        assert code == 1
+        assert "новое" not in readme.read_text(encoding="utf-8")
+        assert "Отказ" in capsys.readouterr().out
+
+    def test_выгрузка_пишется_в_readme(self, tmp_path: Path) -> None:
+        # Копия фикстуры в другой путь — обычная выгрузка для скрипта.
+        source = tmp_path / "vacancies.json"
+        source.write_bytes(render_results.FIXTURE.read_bytes())
+        readme = tmp_path / "README.md"
+        readme.write_text(
+            f"# Проект\n\n## Результаты\n\n{render_results.MARKER_START}\n\n"
+            f"{render_results.MARKER_END}\n\n## Дальше\n",
+            encoding="utf-8",
+        )
+        code = render_results.main(
+            [
+                "--input",
+                str(source),
+                "--write-readme",
+                str(readme),
+                "--figures-dir",
+                str(tmp_path / "figures"),
+                "--text",
+                "python",
+                "--pages",
+                "20",
+                "--collected-at",
+                "2026-11-10",
+            ]
+        )
+        updated = readme.read_text(encoding="utf-8")
+        assert code == 0
+        assert "### 1." in updated
+        assert "10 ноября 2026" in updated
+        assert "## Дальше" in updated
+        # Заголовок не должен задваиваться.
+        assert updated.count("## Результаты") == 1

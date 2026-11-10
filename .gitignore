@@ -7,8 +7,19 @@ data/processed/*
 !data/processed/.gitkeep
 
 # Графики и таблицы, которые собирает пайплайн.
+#
+# Четыре графика результатов — исключение: на них ссылается раздел
+# «Результаты» в README, и без них страница показывает битые картинки.
+# Остальное (промежуточные файлы, черновики) в репозиторий не попадает.
+#
+# Графики из синтетической фикстуры сюда не кладутся: пайплайн на фикстуре
+# пишет их в `.ci/figures` и отказывается писать в `docs/figures`.
 docs/figures/*
 !docs/figures/.gitkeep
+!docs/figures/q1_stack.png
+!docs/figures/q1_stack_by_month.png
+!docs/figures/q2_geography.png
+!docs/figures/q3_experience.png
 
 # Токен доступа к API hh.ru.
 .env

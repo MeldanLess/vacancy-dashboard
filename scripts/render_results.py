@@ -9,9 +9,16 @@
     python scripts/render_results.py --input data/raw/vacancies.json \
         --text python --pages 20
 
+С ключом `--write-readme README.md` скрипт не печатает раздел, а вписывает его
+между маркерами `<!-- РЕЗУЛЬТАТЫ: НАЧАЛО -->` и `<!-- РЕЗУЛЬТАТЫ: КОНЕЦ -->`:
+тогда опубликованные числа и есть числа прогона, а не переписанные руками.
+
 Ключ `--collected-at` задаёт дату среза вручную: по умолчанию берётся время
 изменения файла выгрузки. Графики складываются в `docs/figures/` — их тоже
 нужно приложить к README.
+
+Синтетическая фикстура в README не попадёт: на ней скрипт откажется работать
+без явного `--allow-fixture`.
 """
 
 from __future__ import annotations
@@ -95,17 +102,20 @@ def summary_table(summary: dict[str, object]) -> str:
     return "\n".join(lines)
 
 
-def build_section(
+def build_body(
     summary: dict[str, object],
     results: list[analysis.QuestionResult],
     collected_at: date,
     text: str,
     pages: int,
 ) -> str:
-    """Собирает раздел «Результаты» целиком."""
+    """Тело раздела «Результаты» — без заголовка.
+
+    Заголовок живёт в README уже на месте, а скрипт вписывает между маркерами
+    только тело: иначе при каждом прогоне в README появлялся бы второй
+    заголовок «Результаты».
+    """
     parts = [
-        "## Результаты",
-        "",
         f"_Срез собран {format_date(collected_at)}. Поисковый запрос: `{text}`, "
         f"страниц запрошено: {pages}._",
         "",
@@ -137,6 +147,42 @@ def build_section(
     return "\n".join(parts)
 
 
+def build_section(
+    summary: dict[str, object],
+    results: list[analysis.QuestionResult],
+    collected_at: date,
+    text: str,
+    pages: int,
+) -> str:
+    """Собирает раздел «Результаты» целиком — с заголовком."""
+    return "\n".join(["## Результаты", "", build_body(summary, results, collected_at, text, pages)])
+
+
+# Маркеры, между которыми в README живёт автоматический раздел.
+MARKER_START = "<!-- РЕЗУЛЬТАТЫ: НАЧАЛО -->"
+MARKER_END = "<!-- РЕЗУЛЬТАТЫ: КОНЕЦ -->"
+
+# Синтетическая фикстура: её числа нельзя публиковать как рыночные.
+# Путь и проверка живут в пайплайне — там же, где строится таблица.
+FIXTURE = pipeline.FIXTURE
+is_fixture = pipeline.is_fixture
+
+
+def replace_section(readme_text: str, body: str) -> str:
+    """Вписывает тело раздела между маркерами в текст README.
+
+    Всё, что вне маркеров, остаётся как было: скрипт меняет только числа
+    результатов, а не руками переписанные объяснения.
+    """
+    start = readme_text.find(MARKER_START)
+    end = readme_text.find(MARKER_END)
+    if start == -1 or end == -1 or end < start:
+        raise ValueError(f"В README нет маркеров {MARKER_START} … {MARKER_END}")
+    head = readme_text[: start + len(MARKER_START)]
+    tail = readme_text[end:]
+    return f"{head}\n\n{body}\n\n{tail}"
+
+
 def main(argv: list[str] | None = None) -> int:
     """Точка входа: `python scripts/render_results.py …`."""
     parser = argparse.ArgumentParser(description="Собрать раздел «Результаты» для README.")
@@ -152,11 +198,28 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--figures-dir", default="docs/figures", help="Куда сложить графики.")
     parser.add_argument("--output", default=None, help="Файл для записи. Без него — на экран.")
+    parser.add_argument(
+        "--write-readme",
+        default=None,
+        help="README, в который вписать раздел между маркерами.",
+    )
+    parser.add_argument(
+        "--allow-fixture",
+        action="store_true",
+        help="Разрешить вписать в README данные синтетической фикстуры. Только для тестов.",
+    )
     args = parser.parse_args(argv)
 
     source = Path(args.input)
     if not source.exists():
         print(f"Нет файла выгрузки: {source}")
+        return 1
+
+    if is_fixture(source) and not args.allow_fixture:
+        print(
+            "Отказ: на входе синтетическая фикстура. Её числа нельзя публиковать "
+            "как рыночные — соберите настоящую выгрузку."
+        )
         return 1
 
     frame = pipeline.build(source)
@@ -167,21 +230,23 @@ def main(argv: list[str] | None = None) -> int:
     else:
         collected_at = datetime.fromtimestamp(source.stat().st_mtime).date()
 
-    section = build_section(
-        analysis.dataset_summary(frame),
-        results,
-        collected_at,
-        args.text,
-        args.pages,
-    )
+    summary = analysis.dataset_summary(frame)
+    section = build_section(summary, results, collected_at, args.text, args.pages)
 
     if args.output:
         target = Path(args.output)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(section, encoding="utf-8")
+        target.write_text(section, encoding="utf-8", newline="\n")
         print(f"Раздел записан в {target}")
     else:
         print(section)
+
+    if args.write_readme:
+        readme_path = Path(args.write_readme)
+        readme_text = readme_path.read_text(encoding="utf-8")
+        body = build_body(summary, results, collected_at, args.text, args.pages)
+        readme_path.write_text(replace_section(readme_text, body), encoding="utf-8", newline="\n")
+        print(f"Раздел вписан в {readme_path}")
     return 0
 
 

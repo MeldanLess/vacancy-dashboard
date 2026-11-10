@@ -63,7 +63,8 @@ python -m vacancy_dashboard.collect --text python --pages 20
 python -m vacancy_dashboard.pipeline --input data/raw/vacancies.json
 
 # 4. Подготовить раздел «Результаты» для этого README
-python scripts/render_results.py --input data/raw/vacancies.json --text python --pages 20
+python scripts/render_results.py --input data/raw/vacancies.json --text python --pages 20 \
+    --write-readme README.md
 
 # 5. Посмотреть на то же самое с фильтрами
 streamlit run app/dashboard.py
@@ -80,7 +81,10 @@ streamlit run app/dashboard.py
 app/dashboard.py`.
 
 Есть и `make`: `make install`, `make test`, `make collect`, `make pipeline`,
-`make results`, `make app`.
+`make results`, `make dump`, `make app`.
+
+`make dump` — весь путь до опубликованных чисел одной командой: собрать,
+посчитать, построить графики и вписать раздел «Результаты» в README.
 
 ### Тесты и ноутбуки
 
@@ -133,12 +137,22 @@ jupyter nbconvert --to notebook --execute notebooks/01_stack.ipynb
 момент запроса; архивные убираются, но «срез рынка» не восстанавливается
 задним числом.
 
+**Фикстура не может подделать результат.** Тестовая выборка
+`tests/fixtures/vacancies_sample.json` синтетическая, и её числа не доходят
+до публикации: скрипт `render_results.py` откажется работать с ней без
+явного `--allow-fixture`, а пайплайн не запишет графики из фикстуры в
+`docs/figures/` — туда, откуда README берёт картинки результатов.
+
 ## Результаты
+
+<!-- РЕЗУЛЬТАТЫ: НАЧАЛО -->
 
 > **Раздел ждёт настоящей выгрузки.** Числа ниже появятся после первого
 > сбора с hh.ru. До этого в репозитории лежит только синтетическая фикстура
 > `tests/fixtures/vacancies_sample.json` — она нужна для тестов, и её числа
 > **нельзя** выдавать за рыночные.
+
+<!-- РЕЗУЛЬТАТЫ: КОНЕЦ -->
 
 Когда выгрузка собрана, сюда попадает:
 
@@ -152,12 +166,18 @@ jupyter nbconvert --to notebook --execute notebooks/01_stack.ipynb
 ```bash
 python -m vacancy_dashboard.collect --text python --pages 20
 python -m vacancy_dashboard.pipeline --input data/raw/vacancies.json
-python scripts/render_results.py --input data/raw/vacancies.json --text python --pages 20
+python scripts/render_results.py --input data/raw/vacancies.json --text python --pages 20 \
+    --write-readme README.md
 ```
 
-Скрипт `render_results.py` печатает готовый раздел: сводку по выборке, тексты
-трёх ответов, их таблицы и ссылки на графики. Числа в README отсюда не
-переписываются руками — иначе они разъедутся с прогоном, который их посчитал.
+Скрипт `render_results.py` не печатает раздел, а вписывает его в README между
+маркерами `<!-- РЕЗУЛЬТАТЫ: НАЧАЛО -->` и `<!-- РЕЗУЛЬТАТЫ: КОНЕЦ -->`: сводку
+по выборке, тексты трёх ответов, их таблицы и ссылки на графики. Числа в README
+отсюда не переписываются руками — иначе они разъедутся с прогоном, который их
+посчитал.
+
+На синтетической фикстуре скрипт откажется вписывать раздел: числа тестовой
+фикстуры нельзя выдавать за рыночные.
 
 ## Структура репозитория
 
@@ -170,7 +190,7 @@ vacancy-dashboard/
 ├── scripts/render_results.py  # раздел «Результаты» для README из прогона
 ├── tests/                    # тесты и синтетическая фикстура
 ├── data/                     # сырые и обработанные данные (не в репозитории)
-├── docs/figures/             # графики (не в репозитории)
+├── docs/figures/             # графики: четыре картинки результатов в репозитории
 └── .github/workflows/ci.yml  # стиль, тесты, ноутбуки
 ```
 

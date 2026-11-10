@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from vacancy_dashboard import pipeline
 
@@ -102,3 +103,43 @@ class TestMain:
         summary = json.loads(summary_path.read_text(encoding="utf-8"))
         assert summary["вакансий"] == 11
         assert summary["с зарплатой"] == 10
+
+
+class TestFixtureGuard:
+    """Фикстура не должна переписывать графики, на которые ссылается README."""
+
+    def test_фикстура_не_пишет_в_опубликованные_графики(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys
+    ) -> None:
+        published = (tmp_path / "figures").resolve()
+        monkeypatch.setattr(pipeline, "PUBLISHED_FIGURES", published)
+        code = pipeline.main(
+            [
+                "--input",
+                str(FIXTURE),
+                "--output-dir",
+                str(tmp_path / "processed"),
+                "--figures-dir",
+                str(published),
+            ]
+        )
+        assert code == 1
+        assert not published.exists()
+        assert "Отказ" in capsys.readouterr().out
+
+    def test_настоящая_выгрузка_пишет_графики(self, tmp_path: Path) -> None:
+        # Копия фикстуры в другом пути — для пайплайна это обычный вход.
+        source = tmp_path / "vacancies.json"
+        source.write_bytes(FIXTURE.read_bytes())
+        code = pipeline.main(
+            [
+                "--input",
+                str(source),
+                "--output-dir",
+                str(tmp_path / "processed"),
+                "--figures-dir",
+                str(tmp_path / "figures"),
+            ]
+        )
+        assert code == 0
+        assert (tmp_path / "figures" / "q1_stack.png").exists()

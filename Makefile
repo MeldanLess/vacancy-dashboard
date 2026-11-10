@@ -7,6 +7,7 @@
 #     make pipeline  — посчитать ответы и построить графики
 #     make notebooks — пересобрать ноутбуки из скрипта
 #     make results   — подготовить раздел «Результаты» для README
+#     make dump      — вся выгрузка целиком: сбор, расчёт, графики, README
 #     make app       — запустить дашборд
 
 PYTHON ?= python
@@ -15,7 +16,7 @@ TEXT ?= python
 PAGES ?= 20
 INPUT ?= data/raw/vacancies.json
 
-.PHONY: help install test coverage lint format check collect pipeline notebooks results app clean
+.PHONY: help install test coverage lint format check collect pipeline notebooks results dump app clean
 
 help:
 	@echo "install   — поставить зависимости (requirements.txt и requirements-dev.txt)"
@@ -28,6 +29,7 @@ help:
 	@echo "pipeline  — посчитать три ответа и построить графики"
 	@echo "notebooks — пересобрать ноутбуки из scripts/build_notebooks.py"
 	@echo "results   — подготовить раздел «Результаты» для README из выгрузки"
+	@echo "dump      — вся выгрузка целиком: сбор, расчёт, графики, README"
 	@echo "app       — запустить дашборд на Streamlit"
 	@echo "clean     — убрать временные файлы"
 
@@ -48,7 +50,8 @@ format:
 	$(PYTHON) -m ruff format .
 
 check: lint test
-	$(PYTHON) -m vacancy_dashboard.pipeline --input tests/fixtures/vacancies_sample.json
+	$(PYTHON) -m vacancy_dashboard.pipeline --input tests/fixtures/vacancies_sample.json \
+		--output-dir .ci/processed --figures-dir .ci/figures
 
 collect:
 	$(PYTHON) -m vacancy_dashboard.collect --text $(TEXT) --pages $(PAGES) --out $(INPUT)
@@ -60,7 +63,12 @@ notebooks:
 	$(PYTHON) scripts/build_notebooks.py
 
 results:
-	$(PYTHON) scripts/render_results.py --input $(INPUT) --text $(TEXT) --pages $(PAGES)
+	$(PYTHON) scripts/render_results.py --input $(INPUT) --text $(TEXT) --pages $(PAGES) \
+		--write-readme README.md
+
+# Весь путь до опубликованных чисел одной командой: собрать, посчитать,
+# построить графики и вписать раздел в README.
+dump: collect pipeline results
 
 app:
 	$(PYTHON) -m streamlit run app/dashboard.py
