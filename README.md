@@ -74,6 +74,11 @@ streamlit run app/dashboard.py
 `User-Agent` — в `HH_USER_AGENT` (имя приложения и почта для связи — условие
 работы API, а не формальность).
 
+Дашборд берёт данные из `data/raw/vacancies.json`, а если такой выгрузки нет —
+показывает синтетическую фикстуру и честно предупреждает об этом. Путь можно
+переопределить: `VACANCY_DASHBOARD_DATA=path/to/vacancies.json streamlit run
+app/dashboard.py`.
+
 Есть и `make`: `make install`, `make test`, `make collect`, `make pipeline`,
 `make results`, `make app`.
 

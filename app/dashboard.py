@@ -18,16 +18,27 @@
 
 from __future__ import annotations
 
+import os
+import sys
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
-from vacancy_dashboard import analysis, clean, collect, config
-
 ROOT = Path(__file__).resolve().parent.parent
+# Пакет лежит рядом с приложением, но не установлен: добавляем корень
+# репозитория в путь импорта, чтобы дашборд запускался из любого каталога.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from vacancy_dashboard import analysis, clean, collect, config  # noqa: E402
+
 RAW_DEFAULT = ROOT / "data" / "raw" / "vacancies.json"
 FIXTURE = ROOT / "tests" / "fixtures" / "vacancies_sample.json"
+
+# Путь к данным можно переопределить переменной окружения: так дашборд
+# открывают на своей выгрузке, а тест — на фикстуре.
+DATA_ENV = "VACANCY_DASHBOARD_DATA"
 
 
 def load_frame(path: Path) -> pd.DataFrame:
@@ -41,29 +52,39 @@ def data_source() -> tuple[Path, bool]:
 
     Если выгрузки нет, приложение показывает синтетическую фикстуру и честно
     предупреждает об этом: рыночные числа из фикстуры делать нельзя.
+
+    Переменная окружения `VACANCY_DASHBOARD_DATA` переопределяет путь: так
+    дашборд открывают на своей выгрузке, а тест — на фикстуре, независимо от
+    того, лежит ли настоящая выгрузка рядом.
     """
+    override = os.environ.get(DATA_ENV)
+    if override:
+        path = Path(override)
+        return path, path.resolve() != FIXTURE.resolve()
     if RAW_DEFAULT.exists():
         return RAW_DEFAULT, True
     return FIXTURE, False
 
 
 def sidebar(frame: pd.DataFrame) -> pd.DataFrame:
-    """Фильтры в боковой панели."""
+    """Фильтры в боковой панели.
+
+    По умолчанию выбрано всё, включая вакансии без названного уровня
+    должности: иначе часть выборки молча исчезла бы из ответов, а счётчик
+    «Вакансий» вверху показывал бы число больше, чем в ответах.
+    """
     st.sidebar.header("Фильтры")
 
     city_groups = sorted(frame["city_group"].unique())
     chosen_cities = st.sidebar.multiselect("Группа городов", city_groups, default=city_groups)
 
-    grades = [grade for grade in config.GRADE_ORDER if grade != config.GRADE_UNKNOWN]
+    grades = [*config.GRADE_ORDER, config.GRADE_UNKNOWN]
     chosen_grades = st.sidebar.multiselect("Уровень должности", grades, default=grades)
 
     with_salary = st.sidebar.checkbox("Только вакансии с зарплатой", value=False)
 
-    filtered = frame
-    if chosen_cities:
-        filtered = filtered[filtered["city_group"].isin(chosen_cities)]
-    if chosen_grades:
-        filtered = filtered[filtered["grade"].isin(chosen_grades)]
+    filtered = frame[frame["city_group"].isin(chosen_cities)]
+    filtered = filtered[filtered["grade"].isin(chosen_grades)]
     if with_salary:
         filtered = filtered[filtered["has_salary"]]
 
@@ -75,7 +96,7 @@ def show_answer(result: analysis.QuestionResult, figure: object) -> None:
     """Один ответ: заголовок, текст, таблица и график."""
     st.subheader(result.title)
     st.write(result.text)
-    st.dataframe(result.table, use_container_width=True)
+    st.dataframe(result.table)
     st.pyplot(figure)
 
 
@@ -85,6 +106,9 @@ def main() -> None:
     st.title("Вакансии hh.ru: три вопроса к рынку")
 
     path, is_real = data_source()
+    if not path.exists():
+        st.error(f"Файл с данными не найден: {path}")
+        return
     if not is_real:
         st.warning(
             "Настоящей выгрузки нет — приложение показывает синтетическую фикстуру. "
@@ -124,7 +148,7 @@ def main() -> None:
     st.subheader("Динамика по месяцам")
     technologies = list(stack.table["Технология"][:5])
     months = analysis.stack_by_month(filtered, technologies)
-    st.dataframe(months.round(1), use_container_width=True)
+    st.dataframe(months.round(1))
     st.pyplot(analysis.monthly_trend(filtered, technologies))
     st.caption(
         "В таблице — доля вакансий с каждой технологией по месяцам публикации, "
@@ -132,7 +156,7 @@ def main() -> None:
     )
 
     st.subheader("Сырые данные")
-    st.dataframe(filtered.drop(columns=["text"]), use_container_width=True)
+    st.dataframe(filtered.drop(columns=["text"]))
 
 
 if __name__ == "__main__":
