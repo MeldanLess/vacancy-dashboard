@@ -72,7 +72,7 @@ sudo ln -s /etc/nginx/sites-available/vacancy-dashboard /etc/nginx/sites-enabled
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-В `deploy/nginx.conf` стоит заменить `dashboard.your-domain.com` на свой
+В `deploy/nginx.conf` стоит заменить `dashboard.example.com` на свой
 домен — и в блоке с портом 80, и в блоке с HTTPS, и в путях к сертификату.
 
 Сертификат:
