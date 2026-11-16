@@ -20,9 +20,10 @@ from __future__ import annotations
 API_URL = "https://api.hh.ru/vacancies"
 
 # hh.ru требует в `User-Agent` имя приложения и контактный адрес. Без него
-# запросы отклоняются с 403. Адрес — заглушка: его нужно заменить на свой,
-# иначе hh.ru не сможет связаться с автором при вопросах по данным.
-DEFAULT_USER_AGENT = "vacancy-dashboard (your@example.com)"
+# запросы отклоняются с 403, а с заглушкой — с 400 «blacklisted»: адрес
+# вида `your@example.com` hh.ru считает выдуманным и не пускает вовсе.
+# Адрес поменять можно через переменную окружения HH_USER_AGENT.
+DEFAULT_USER_AGENT = "vacancy-dashboard (danila.meleca@gmail.com)"
 
 # Код региона «Россия» в справочнике hh.ru. 113 — вся страна.
 AREA_RUSSIA = 113

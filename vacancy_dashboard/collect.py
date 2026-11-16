@@ -89,6 +89,29 @@ class CollectError(RuntimeError):
     """Сбор не удался: сервер не отвечает или отвечает отказом."""
 
 
+def explain(status_code: int, text: str) -> str:
+    """Человеческое объяснение отказа hh.ru.
+
+    Голый ответ `{"errors":[{"type":"forbidden"}]` ничего не говорит: не
+    понятно, что именно сломано — заголовок, токен или доступ. Здесь каждая
+    известная причина превращается в строку, по которой видно, что делать.
+    """
+    if status_code == 403 and "forbidden" in text:
+        return (
+            "hh.ru не пускает запрос без токена приложения. "
+            "Зарегистрируйте приложение на https://dev.hh.ru/admin и положите "
+            "токен в переменную окружения HH_TOKEN."
+        )
+    if status_code == 400 and "blacklisted" in text:
+        return (
+            "hh.ru не принимает User-Agent: заглушка или выдуманный адрес в "
+            "нём попадают в чёрный список. Задайте настоящий адрес в HH_USER_AGENT."
+        )
+    if status_code == 403:
+        return "hh.ru отказал в доступе. Обычно это отсутствие токена приложения."
+    return ""
+
+
 def fetch_page(
     session: requests.Session,
     settings: CollectSettings,
@@ -121,10 +144,14 @@ def fetch_page(
             if response.status_code >= 500:
                 last_error = CollectError(f"hh.ru ответил {response.status_code}")
             else:
-                raise CollectError(
+                hint = explain(response.status_code, response.text)
+                message = (
                     f"hh.ru ответил {response.status_code} на страницу {page}: "
                     f"{response.text[:300]}"
                 )
+                if hint:
+                    message = f"{message}\n{hint}"
+                raise CollectError(message)
         time.sleep(BACKOFF_SECONDS * (2**attempt))
 
     raise CollectError(f"не удалось получить страницу {page}: {last_error}")
