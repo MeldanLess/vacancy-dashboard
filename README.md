@@ -104,6 +104,16 @@ python scripts/render_results.py --input data/raw/vacancies.json --text python -
    имя приложения и почту для связи, а заглушку вида `your@example.com`
    отправляет в чёрный список.
 
+С токеном весь путь до опубликованных чисел — одна команда:
+
+```bash
+# Git Bash (Windows) или Linux/macOS
+HH_TOKEN=ваш_токен python scripts/publish_results.py --text python --pages 20
+
+# PowerShell
+$env:HH_TOKEN = "ваш_токен"; python scripts/publish_results.py --text python --pages 20
+```
+
 Дашборд берёт данные из `data/raw/vacancies.json`, а если такой выгрузки нет —
 показывает синтетическую фикстуру и честно предупреждает об этом. Путь можно
 переопределить: `VACANCY_DASHBOARD_DATA=path/to/vacancies.json streamlit run
